@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Something went wrong · Hostel Management System{% endblock %}
+{% block content %}
+<div class="empty-state error-page">
+  <div class="empty-icon" aria-hidden="true">⚠️</div>
+  <h1>500 — Something went wrong</h1>
+  <p>An unexpected error occurred. Please try again in a moment.</p>
+  <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Back to dashboard</a>
+</div>
+{% endblock %}

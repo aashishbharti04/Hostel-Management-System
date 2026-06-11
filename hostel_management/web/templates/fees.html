@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Fees · Hostel Management System{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>Fee schedule</h1>
+    <p class="muted">Per-department fees applied to admissions.</p>
+  </div>
+</section>
+
+<div class="two-col">
+  <div class="panel">
+    <div class="panel-head"><h2>Current fees</h2></div>
+    {% if fees %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Department</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+          {% for f in fees %}
+          <tr><td><span class="badge">{{ f.department }}</span></td><td class="num">₹{{ '{:,}'.format(f.amount) }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon" aria-hidden="true">💸</div><h3>No fees configured</h3></div>
+    {% endif %}
+  </div>
+
+  <div class="panel form-panel">
+    <div class="panel-head"><h2>Set a fee</h2></div>
+    <form method="post" action="{{ url_for('fees') }}" class="form">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
+      <div class="field">
+        <label for="department">Department</label>
+        <select class="input" id="department" name="department" required>
+          {% for d in DEPARTMENTS %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="amount">Amount (₹)</label>
+        <input class="input" id="amount" name="amount" type="number" min="0" required />
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Save fee</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

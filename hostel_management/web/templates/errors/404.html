@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Page not found · Hostel Management System{% endblock %}
+{% block content %}
+<div class="empty-state error-page">
+  <div class="empty-icon" aria-hidden="true">🧭</div>
+  <h1>404 — Page not found</h1>
+  <p>The page you’re looking for doesn’t exist or has moved.</p>
+  <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Back to dashboard</a>
+</div>
+{% endblock %}

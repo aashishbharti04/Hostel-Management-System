@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Students · Hostel Management System{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>Students</h1>
+    <p class="muted">{{ students|length }} record{{ '' if students|length == 1 else 's' }}</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('student_new') }}">+ Admit student</a>
+</section>
+
+<form class="toolbar" method="get" action="{{ url_for('students') }}" role="search">
+  <input
+    type="search"
+    name="q"
+    value="{{ query }}"
+    class="input"
+    placeholder="Search by name, department, or roll number…"
+    aria-label="Search students" />
+  <button class="btn" type="submit">Search</button>
+  {% if query %}<a class="btn btn-ghost" href="{{ url_for('students') }}">Clear</a>{% endif %}
+</form>
+
+{% if students %}
+<div class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Roll</th><th>Name</th><th>Address</th><th>Dept</th><th>Room</th>
+          <th class="num">Fees</th><th class="num">Balance</th><th class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td>{{ s.roll_no }}</td>
+          <td>{{ s.name }}</td>
+          <td class="muted">{{ s.address }}</td>
+          <td><span class="badge">{{ s.dept }}</span></td>
+          <td>{{ s.room_no }}</td>
+          <td class="num">₹{{ '{:,}'.format(s.fees) }}</td>
+          <td class="num">₹{{ '{:,}'.format(s.balance) }}</td>
+          <td class="actions-col">
+            <a class="btn btn-sm btn-ghost" href="{{ url_for('student_edit', roll_no=s.roll_no) }}">Edit</a>
+            <form method="post" action="{{ url_for('student_delete', roll_no=s.roll_no) }}"
+                  class="inline-form" data-confirm="Delete roll {{ s.roll_no }} ({{ s.name }})?">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
+              <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon" aria-hidden="true">🔍</div>
+  <h3>{% if query %}No matches for “{{ query }}”{% else %}No students yet{% endif %}</h3>
+  <p>{% if query %}Try a different search term.{% else %}Admit your first resident to get started.{% endif %}</p>
+  {% if query %}
+    <a class="btn" href="{{ url_for('students') }}">Clear search</a>
+  {% else %}
+    <a class="btn btn-primary" href="{{ url_for('student_new') }}">+ Admit student</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

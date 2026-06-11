@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & Discussions
+    url: https://github.com/aashishbharti04/Hostel-Management-System/discussions
+    about: Ask questions and discuss ideas with the community.
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/aashishbharti04/Hostel-Management-System/blob/main/SECURITY.md
+    about: Please report security issues privately, not as public issues.

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Hostel Management System{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="muted">Overview of residents, departments, and fees.</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('student_new') }}">+ Admit student</a>
+</section>
+
+<section class="stat-grid" aria-label="Key statistics">
+  <article class="stat-card">
+    <span class="stat-label">Total students</span>
+    <span class="stat-value">{{ stats.total_students }}</span>
+  </article>
+  <article class="stat-card">
+    <span class="stat-label">Departments</span>
+    <span class="stat-value">{{ stats.total_departments }}</span>
+  </article>
+  <article class="stat-card">
+    <span class="stat-label">Fees billed</span>
+    <span class="stat-value">₹{{ '{:,}'.format(stats.total_fees_billed) }}</span>
+  </article>
+  <article class="stat-card stat-card--accent">
+    <span class="stat-label">Outstanding balance</span>
+    <span class="stat-value">₹{{ '{:,}'.format(stats.outstanding_balance) }}</span>
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Recent students</h2>
+    <a href="{{ url_for('students') }}" class="link">View all →</a>
+  </div>
+
+  {% if students %}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Roll</th><th>Name</th><th>Dept</th><th>Room</th><th class="num">Balance</th></tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td>{{ s.roll_no }}</td>
+          <td>{{ s.name }}</td>
+          <td><span class="badge">{{ s.dept }}</span></td>
+          <td>{{ s.room_no }}</td>
+          <td class="num">₹{{ '{:,}'.format(s.balance) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon" aria-hidden="true">🏨</div>
+    <h3>No students yet</h3>
+    <p>Admit your first resident to get started.</p>
+    <a class="btn btn-primary" href="{{ url_for('student_new') }}">+ Admit student</a>
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-head"><h2>Fee schedule</h2><a href="{{ url_for('fees') }}" class="link">Manage →</a></div>
+  <div class="chip-row">
+    {% for f in fees %}
+    <span class="chip"><strong>{{ f.department }}</strong> ₹{{ '{:,}'.format(f.amount) }}</span>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
