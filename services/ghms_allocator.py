@@ -1,8 +1,9 @@
 """Deterministic CP-SAT hostel allocator. Install requirements-allocation.txt."""
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 try:
     from ortools.sat.python import cp_model
