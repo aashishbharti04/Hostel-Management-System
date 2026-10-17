@@ -1,0 +1,83 @@
+name: Allocation release validation
+
+on:
+  push:
+    branches: [feat/ghms-production-readiness]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: allocation-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python lint and allocation tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt -r requirements-allocation.txt
+      - name: Ruff lint
+        run: ruff check services tests
+      - name: Ruff formatting
+        run: ruff format --check services tests
+      - name: Run tests
+        run: pytest --cov=hostel_management --cov=services.ghms_allocator --cov-report=term-missing
+
+  frontend:
+    name: Frontend lockfile, tests and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web/ai-allocation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: web/ai-allocation/package.json
+      - name: Generate lockfile and install deterministically
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm ci --no-audit --no-fund
+      - name: Frontend tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: Upload generated lockfile
+        if: always() && hashFiles('web/ai-allocation/package-lock.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghms-frontend-lockfile
+          path: web/ai-allocation/package-lock.json
+          if-no-files-found: error
+
+  database:
+    name: Supabase migration and pgTAP tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Start local Supabase and apply migrations
+        run: |
+          npx --yes supabase@latest start
+          npx --yes supabase@latest db reset
+      - name: Run database tests
+        run: npx --yes supabase@latest test db
+      - name: Stop local Supabase
+        if: always()
+        run: npx --yes supabase@latest stop --no-backup
