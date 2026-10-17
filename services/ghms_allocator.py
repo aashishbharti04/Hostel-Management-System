@@ -1,4 +1,5 @@
 """Deterministic CP-SAT hostel allocator. Install requirements-allocation.txt."""
+
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
@@ -51,11 +52,7 @@ def solve_allocation(
         if not application.get("eligible", False):
             continue
         priority = application.get("priority", 0)
-        if (
-            isinstance(priority, bool)
-            or not isinstance(priority, int)
-            or not 0 <= priority <= 100
-        ):
+        if isinstance(priority, bool) or not isinstance(priority, int) or not 0 <= priority <= 100:
             raise ValueError("priority must be an integer from 0 to 100")
         if not application.get("student_id"):
             raise ValueError("Every application must have a student_id")
@@ -84,13 +81,11 @@ def solve_allocation(
     variables = {}
     for app_index, application in enumerate(eligible):
         for bed_index, bed in enumerate(available):
-            hostel_ok = (
-                not application.get("requested_hostel_id")
-                or str(application["requested_hostel_id"]) == str(bed.get("hostel_id"))
-            )
-            access_ok = (
-                not application.get("accessibility_required", False)
-                or bool(bed.get("is_accessible", False))
+            hostel_ok = not application.get("requested_hostel_id") or str(
+                application["requested_hostel_id"]
+            ) == str(bed.get("hostel_id"))
+            access_ok = not application.get("accessibility_required", False) or bool(
+                bed.get("is_accessible", False)
             )
             if hostel_ok and access_ok:
                 variables[app_index, bed_index] = model.new_bool_var(
@@ -99,21 +94,11 @@ def solve_allocation(
 
     for app_index in range(len(eligible)):
         model.add(
-            sum(
-                variable
-                for (index, _), variable in variables.items()
-                if index == app_index
-            )
-            <= 1
+            sum(variable for (index, _), variable in variables.items() if index == app_index) <= 1
         )
     for bed_index in range(len(available)):
         model.add(
-            sum(
-                variable
-                for (_, index), variable in variables.items()
-                if index == bed_index
-            )
-            <= 1
+            sum(variable for (_, index), variable in variables.items() if index == bed_index) <= 1
         )
 
     # This bonus makes assignment coverage dominate all secondary scores.
@@ -122,13 +107,9 @@ def solve_allocation(
     for (app_index, bed_index), variable in variables.items():
         application = eligible[app_index]
         bed = available[bed_index]
-        preferred = bed.get("room_type") in (
-            application.get("preferred_room_types") or []
-        )
+        preferred = bed.get("room_type") in (application.get("preferred_room_types") or [])
         score = (
-            int(application.get("priority", 0))
-            + (100 if preferred else 0)
-            + max(0, 10 - bed_index)
+            int(application.get("priority", 0)) + (100 if preferred else 0) + max(0, 10 - bed_index)
         )
         objective_terms.append(variable * (assignment_bonus + score))
 
@@ -167,9 +148,7 @@ def solve_allocation(
             continue
         application = eligible[app_index]
         bed = available[bed_index]
-        preferred = bed.get("room_type") in (
-            application.get("preferred_room_types") or []
-        )
+        preferred = bed.get("room_type") in (application.get("preferred_room_types") or [])
         reasons = ["eligible_application_and_available_bed"]
         if application.get("requested_hostel_id"):
             reasons.append("requested_hostel_satisfied")
