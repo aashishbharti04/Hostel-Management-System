@@ -27,11 +27,12 @@ def test_accessibility_and_unique_assignments():
     assert result.status == "optimal"
     assert len(result.assignments) == 2
     assert len({assignment["bed_id"] for assignment in result.assignments}) == 2
-    assert next(
-        assignment
-        for assignment in result.assignments
-        if assignment["student_id"] == "s1"
-    )["bed_id"] == "b2"
+    assert (
+        next(assignment for assignment in result.assignments if assignment["student_id"] == "s1")[
+            "bed_id"
+        ]
+        == "b2"
+    )
     assert result.metrics["unassigned_eligible"] == 0
 
 
