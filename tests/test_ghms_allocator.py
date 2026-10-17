@@ -1,4 +1,5 @@
 import pytest
+
 from services.ghms_allocator import solve_allocation
 
 pytest.importorskip("ortools")
