@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pfe-ra"
+version = "0.1.0"
+description = "Policy-aware fair and explainable hostel room allocation research engine"
+requires-python = ">=3.10"
+dependencies = ["ortools>=9.10,<10"]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0", "pytest-cov>=5.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pfera*"]
