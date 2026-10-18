@@ -1,0 +1,41 @@
+name: Supabase database CI
+on:
+  push:
+    branches: [main, "feat/**", "fix/**"]
+    paths: ["supabase/**", ".github/workflows/supabase-db.yml"]
+  pull_request:
+    branches: [main]
+    paths: ["supabase/**", ".github/workflows/supabase-db.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: supabase-db-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  migrations-and-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Check migration layout
+        run: |
+          test -f supabase/config.toml
+          test -n "$(find supabase/migrations -maxdepth 1 -name '*.sql' -print -quit)"
+      - name: Start local stack
+        run: supabase start -x studio,mailpit,edge-runtime,logflare,vector
+      - name: Reset from clean migrations and seed
+        run: supabase db reset
+      - name: Run SQL regression tests
+        run: supabase test db
+      - name: Diagnostics on failure
+        if: failure()
+        run: |
+          supabase status || true
+          docker ps -a || true
+      - name: Stop local stack
+        if: always()
+        run: supabase stop --no-backup || true
