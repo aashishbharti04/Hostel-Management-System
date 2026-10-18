@@ -1,0 +1,13 @@
+{
+  "policy_version": "synthetic-demo-v1",
+  "reference_group": "A",
+  "records": [
+    {"subject_id":"a-1","group":"A","eligible":true,"selected":true,"decision":"approved"},
+    {"subject_id":"a-2","group":"A","eligible":true,"selected":false,"decision":"waitlisted"},
+    {"subject_id":"a-3","group":"A","eligible":true,"selected":true,"decision":"approved"},
+    {"subject_id":"b-1","group":"B","eligible":true,"selected":false,"decision":"waitlisted"},
+    {"subject_id":"b-2","group":"B","eligible":true,"selected":false,"decision":"waitlisted"},
+    {"subject_id":"b-3","group":"B","eligible":true,"selected":true,"decision":"approved"}
+  ],
+  "notice": "Synthetic demonstration data only; not production student records."
+}
